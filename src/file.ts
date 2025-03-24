@@ -1,12 +1,12 @@
 import client from "./client.js";
-import { DOMParser, Element, parseHTML } from "linkedom";
+import { parseHTML } from "linkedom";
 import fs from "fs/promises";
 import config from "./config.js";
 import { QueueItem } from "./types.js";
 
 const cwd = process.cwd();
 
-function checkFileExists(file: string) {
+async function checkFileExists(file: string) {
   return fs.access(file, fs.constants.F_OK)
     .then(() => true)
     .catch(() => false);
