@@ -7,6 +7,8 @@ clone this repo and cd into it
 git clone https://github.com/npmSteven/recharge-watch.git && cd recharge-watch.git
 ```
 
+create .env from .env.example
+
 install node modules with pnpm
 ```bash
 pnpm i
