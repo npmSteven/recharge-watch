@@ -4,7 +4,7 @@ import fs from "fs/promises";
 import config from "./config.js";
 import { QueueItem } from "./types.js";
 
-const cwd = process.cwd();
+const cwd = config.cwd;
 
 async function checkFileExists(file: string) {
   return fs.access(file, fs.constants.F_OK)
@@ -59,6 +59,7 @@ export async function addFile(item: QueueItem) {
       {
         filename: item.path,
         source: fileContent,
+        skip_validation: "1"
       },
     );
   } catch (error) {
@@ -80,18 +81,13 @@ export async function editFile(item: QueueItem) {
       throw new Error("We was unable to find the file on recharge");
     }
     const fileContent = await fs.readFile(fileLocation, "utf-8");
-    console.log({
-      filename: item.path,
-      source: fileContent,
-    });
-
     await client.post(
       `/portal_theme/${config.theme_id}/assets/${foundFile.id}/edit.json`,
       {
         filename: item.path,
         source: fileContent,
-      },
-    );
+        skip_validation: "1"
+      });
   } catch (error) {
     console.error("ERROR - editFile():", error);
     throw error;
