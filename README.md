@@ -4,7 +4,7 @@ Automatically watch for changes and sync them to recharge
 ### How to run
 clone this repo and cd into it
 ```bash
-git clone https://github.com/npmSteven/recharge-watch.git && cd recharge-watch.git
+git clone https://github.com/npmSteven/recharge-watch.git && cd recharge-watch
 ```
 
 create .env from .env.example
