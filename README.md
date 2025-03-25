@@ -33,9 +33,10 @@ npm run --prefix ../recharge-watch start
 
 ### TODO
 - [ ] Do not allow editing live theme
-- [ ] Open preview of theme automically
+- [ ] Open preview theme automically
 - [ ] Automatically reload theme on change from the browser
 - [ ] Before syncing changes to recharge validate that the content is valid for the content type
+- [ ] Check if meta.json file exists before syncing to ensure that it is a valid recharge theme
 
 ### NOT SUPPORTED
 - [ ] We only support syncing the top level
