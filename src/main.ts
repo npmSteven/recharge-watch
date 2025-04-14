@@ -2,6 +2,8 @@ import chokidar from "chokidar";
 import { QueueItem } from "./types.js";
 import { addFile, deleteFile, editFile } from "./file.js";
 import config from "./config.js";
+import { getCookieStr, getDevelopmentUrl, login } from "./recharge.js";
+import client from "./client.js";
 
 const cwd = config.cwd;
 
@@ -29,13 +31,14 @@ function enqueue(item: QueueItem) {
 
 async function processQueue(queue: QueueItem[], chunkSize: number = 10) {
   try {
-    console.clear();
-    console.log("Watching for file changes", cwd);
+    await logWatchingChanges();
     // Continue processing until the queue is empty
     while (queue.length > 0) {
+
+      await logWatchingChanges();
+      console.log('Syncing', queue.length);
       // Remove a chunk of items from the front of the queue
       const currentChunk = queue.splice(0, chunkSize);
-      console.log(`[Processing]`, currentChunk.map(q => q.path).join(','))
       // Process each item in the chunk concurrently
       await Promise.all(
         currentChunk.map(async queuedItem => {
@@ -52,17 +55,26 @@ async function processQueue(queue: QueueItem[], chunkSize: number = 10) {
           }
         })
       );
-      console.log(`[Finished]`, currentChunk.map(q => q.path).join(','))
     }
+    await logWatchingChanges();
+    console.log('Synced files');
   } catch (error) {
     console.error("ERROR - processQueue():", error.data);
     throw error;
   }
 }
 
-function init() {
+async function logWatchingChanges() {
   console.clear();
+  const url = await getDevelopmentUrl();
   console.log("Watching for files changes", cwd);
+  console.log("Develop URL:", url);
+}
+
+async function init() {
+  await login();
+  client.defaults.headers.Cookie = await getCookieStr();
+  await logWatchingChanges();
   // Watch for changes
   chokidar.watch(cwd, {
     depth: 0,
