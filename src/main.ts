@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import chokidar from "chokidar";
 import { QueueItem } from "./types.js";
-import { addFile, deleteFile, editFile } from "./file.js";
+import { addFile, checkFileExists, deleteFile, editFile } from "./file.js";
 import config from "./config.js";
 import { getCookieStr, getDevelopmentUrl, login } from "./recharge.js";
 import client from "./client.js";
@@ -85,31 +85,40 @@ function fetchENVFromArgV(): void {
 }
 
 async function init(): Promise<void> {
-  fetchENVFromArgV();
-  await login();
-  client.defaults.headers.Cookie = await getCookieStr();
-  await logWatchingChanges();
-  // Watch for changes
-  chokidar.watch(cwd, {
-    depth: 0,
-    followSymlinks: false,
-    cwd,
-    interval: 100,
-    persistent: true,
-  }).on("all", (event, path) => {
-    // Validate the event type on remove, add, change
-    if (!["unlink", "add", "change"].includes(event)) return;
-    // Validate flile types
-    if (![".js", ".html", ".svg", '.css'].find((ext) => path.endsWith(ext))) return;
+  try {
+    const hasMetaFile = await checkFileExists(`${cwd}/meta.json`);
+    if (!hasMetaFile) {
+      throw new Error('You cannot sync changes in this repo this is not a valid recharge repo');
+    }
+    fetchENVFromArgV();
+    await login();
+    client.defaults.headers.Cookie = await getCookieStr();
+    await logWatchingChanges();
+    // Watch for changes
+    chokidar.watch(cwd, {
+      depth: 0,
+      followSymlinks: false,
+      cwd,
+      interval: 100,
+      persistent: true,
+    }).on("all", (event, path) => {
+      // Validate the event type on remove, add, change
+      if (!["unlink", "add", "change"].includes(event)) return;
+      // Validate flile types
+      if (![".js", ".html", ".svg", '.css'].find((ext) => path.endsWith(ext))) return;
 
-    // Queue the item
-    enqueue({ event, path });
+      // Queue the item
+      enqueue({ event, path });
 
-    // Process the queue
-    debounce(1000, async () => {
-      await processQueue(queue, 10);
+      // Process the queue
+      debounce(1000, async () => {
+        await processQueue(queue, 10);
+      });
     });
-  });
+  } catch (error) {
+    console.error('ERROR - init():', error);
+    process.exit(1);
+  }
 }
 
 init();

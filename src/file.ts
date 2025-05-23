@@ -6,7 +6,7 @@ import { QueueItem } from "./types.js";
 
 const cwd = config.cwd;
 
-async function checkFileExists(file: string): Promise<boolean> {
+export async function checkFileExists(file: string): Promise<boolean> {
   return fs.access(file, fs.constants.F_OK)
     .then(() => true)
     .catch(() => false);
