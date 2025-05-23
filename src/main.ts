@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 import chokidar from "chokidar";
 import { QueueItem } from "./types.js";
 import { addFile, deleteFile, editFile } from "./file.js";
@@ -71,7 +72,18 @@ async function logWatchingChanges(): Promise<void> {
   console.log("Develop URL:", url);
 }
 
+function fetchENVFromArgV(): void {
+  for (const arg of process.argv) {
+    const [key, value] = arg.split('=');
+    if (!key.startsWith('RECHARGE_')) {
+      continue;
+    }
+    config[key.split('RECHARGE_')[1].toLowerCase()] = value;
+  }
+}
+
 async function init(): Promise<void> {
+  fetchENVFromArgV();
   await login();
   client.defaults.headers.Cookie = await getCookieStr();
   await logWatchingChanges();

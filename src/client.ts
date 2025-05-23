@@ -7,7 +7,7 @@ const client = axios.create({
   headers: {
     Accept: "application/json, text/plain, */*",
     "Content-Type": "multipart/form-data",
-    Host: config.store.replace("https://", ""),
+    Host: config?.store?.replace("https://", ""),
     Origin: config.store,
     Referer: `${config.store}/merchant/theme-editor`,
     "User-Agent":
