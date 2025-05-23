@@ -6,6 +6,8 @@ import config from "./config.js";
 import { getCookieStr, getDevelopmentUrl, login } from "./recharge.js";
 import client from "./client.js";
 
+console.log('main.ts loaded successfully');
+
 const cwd = config.cwd;
 
 // not ideal as it is declared globally not reusable
