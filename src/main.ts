@@ -9,7 +9,7 @@ const cwd = config.cwd;
 
 // not ideal as it is declared globally not reusable
 let timeoutId: NodeJS.Timeout | undefined = undefined;
-function debounce(delayMS: number, callback: () => void) {
+function debounce(delayMS: number, callback: () => void): void {
   if (timeoutId) {
     clearTimeout(timeoutId);
   }
@@ -20,7 +20,7 @@ function debounce(delayMS: number, callback: () => void) {
 
 const queue: QueueItem[] = [];
 
-function enqueue(item: QueueItem) {
+function enqueue(item: QueueItem): void {
   const queuedItem = queue.find((q) =>
     q.event === item.event && q.path === item.path
   );
@@ -29,7 +29,7 @@ function enqueue(item: QueueItem) {
   }
 }
 
-async function processQueue(queue: QueueItem[], chunkSize: number = 10) {
+async function processQueue(queue: QueueItem[], chunkSize: number = 10): Promise<void> {
   try {
     await logWatchingChanges();
     // Continue processing until the queue is empty
@@ -64,14 +64,14 @@ async function processQueue(queue: QueueItem[], chunkSize: number = 10) {
   }
 }
 
-async function logWatchingChanges() {
+async function logWatchingChanges(): Promise<void> {
   console.clear();
   const url = await getDevelopmentUrl();
   console.log("Watching for files changes", cwd);
   console.log("Develop URL:", url);
 }
 
-async function init() {
+async function init(): Promise<void> {
   await login();
   client.defaults.headers.Cookie = await getCookieStr();
   await logWatchingChanges();

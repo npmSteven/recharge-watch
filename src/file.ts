@@ -6,15 +6,15 @@ import { QueueItem } from "./types.js";
 
 const cwd = config.cwd;
 
-async function checkFileExists(file: string) {
+async function checkFileExists(file: string): Promise<boolean> {
   return fs.access(file, fs.constants.F_OK)
     .then(() => true)
     .catch(() => false);
 }
 
-let files = [];
+let files: Array<{ id: string; filename: string }> = [];
 
-export async function getFiles(useCache = true) {
+export async function getFiles(useCache = true): Promise<Array<{ id: string; filename: string }>> {
   try {
     if (files.length > 0 && useCache) {
       console.log("using cache");
@@ -38,7 +38,7 @@ export async function getFiles(useCache = true) {
   }
 }
 
-export async function addFile(item: QueueItem) {
+export async function addFile(item: QueueItem): Promise<void> {
   try {
     const fileLocation = `${cwd}/${item.path}`;
     const doesFileExist = await checkFileExists(fileLocation);
@@ -68,7 +68,7 @@ export async function addFile(item: QueueItem) {
   }
 }
 
-export async function editFile(item: QueueItem) {
+export async function editFile(item: QueueItem): Promise<void> {
   try {
     const fileLocation = `${cwd}/${item.path}`;
     const doesFileExist = await checkFileExists(fileLocation);
@@ -94,7 +94,7 @@ export async function editFile(item: QueueItem) {
   }
 }
 
-export async function deleteFile(item: QueueItem) {
+export async function deleteFile(item: QueueItem): Promise<void> {
   try {
     const fetchedFiles = await getFiles();
     const foundFile = fetchedFiles.find((f) => f.filename === item.path);

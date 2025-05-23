@@ -11,7 +11,7 @@ const launchResponse: {
   browser?: puppeteer.Browser,
 } = {};
 
-async function launch() {
+async function launch(): Promise<void> {
   try {
     if (alreadyLaunched) return;
     const browser = await puppeteer.launch({
@@ -28,7 +28,7 @@ async function launch() {
   }
 }
 
-export async function login() {
+export async function login(): Promise<void> {
   try {
     await launch();
     const { page, browser } = launchResponse;
@@ -44,7 +44,7 @@ export async function login() {
   }
 }
 
-export async function getCookieStr() {
+export async function getCookieStr(): Promise<string> {
   try {
     if (cache?.cookieStr) return cache.cookieStr;
     const { page, browser } = launchResponse;
@@ -59,7 +59,7 @@ export async function getCookieStr() {
   }
 }
 
-export async function getSession() {
+export async function getSession(): Promise<string> {
   try {
     if (cache?.session) return cache.session;
     const { page, browser } = launchResponse;
@@ -75,7 +75,7 @@ export async function getSession() {
   }
 }
 
-export async function getDevelopmentUrl() {
+export async function getDevelopmentUrl(): Promise<string> {
   try {
     if (cache?.dev_url) return cache.dev_url;
     const cookieStr = await getCookieStr();
