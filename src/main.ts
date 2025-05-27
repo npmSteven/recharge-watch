@@ -1,12 +1,11 @@
 #!/usr/bin/env node
 import chokidar from "chokidar";
+import fs from 'fs/promises';
 import { QueueItem } from "./types.js";
 import { addFile, checkFileExists, deleteFile, editFile } from "./file.js";
 import config from "./config.js";
 import { getCookieStr, getDevelopmentUrl, login } from "./recharge.js";
-import client from "./client.js";
-
-console.log('main.ts loaded successfully');
+import { client, initalizeClient } from "./client.js";
 
 const cwd = config.cwd;
 
@@ -84,17 +83,24 @@ function fetchENVFromArgV(): void {
   }
 }
 
-async function init(): Promise<void> {
+const validFileTypes = [".js", ".html", ".svg", '.css'];
+
+async function sync() {
+  // fetch all of the files in the current directory
+  const files = await fs.readdir(cwd);
+  const validFiles = files.filter(f => validFileTypes.find(ft => f.endsWith(ft)))
+  for (const f of validFiles) {
+    enqueue({ path: f, event: 'add' });
+  }
+  await processQueue(queue)
+  console.log('Finished queue');
+}
+
+async function watchForChanges() {
   try {
-    const hasMetaFile = await checkFileExists(`${cwd}/meta.json`);
-    if (!hasMetaFile) {
-      throw new Error('You cannot sync changes in this repo this is not a valid recharge repo');
-    }
-    fetchENVFromArgV();
-    await login();
-    client.defaults.headers.Cookie = await getCookieStr();
     await logWatchingChanges();
     // Watch for changes
+    console.log('Watching for changes');
     chokidar.watch(cwd, {
       depth: 0,
       followSymlinks: false,
@@ -105,7 +111,7 @@ async function init(): Promise<void> {
       // Validate the event type on remove, add, change
       if (!["unlink", "add", "change"].includes(event)) return;
       // Validate flile types
-      if (![".js", ".html", ".svg", '.css'].find((ext) => path.endsWith(ext))) return;
+      if (!validFileTypes.find((ext) => path.endsWith(ext))) return;
 
       // Queue the item
       enqueue({ event, path });
@@ -115,6 +121,37 @@ async function init(): Promise<void> {
         await processQueue(queue, 10);
       });
     });
+  } catch (error) {
+    console.error('ERROR - watchForChanges():', error);
+    throw error;
+  }
+}
+
+async function init(): Promise<void> {
+  try {
+    console.log('Fetching args for env');
+    fetchENVFromArgV();
+    initalizeClient();
+    console.log('Checking valid recharge repo');
+    const hasMetaFile = await checkFileExists(`${cwd}/meta.json`);
+    if (!hasMetaFile) {
+      throw new Error('You cannot sync changes in this repo this is not a valid recharge repo');
+    }
+    console.log('Logging into recharge')
+    await login();
+    console.log('Setting cookie');
+    client.defaults.headers.Cookie = await getCookieStr();
+    switch (config.mode) {
+      case 'watch':
+        await watchForChanges();
+        break;
+      case 'single':
+        await sync();
+        process.exit(0);
+        break;
+      default:
+        throw new Error('You have not provided a RECHARGE_MODE either single or watch');
+    }
   } catch (error) {
     console.error('ERROR - init():', error);
     process.exit(1);

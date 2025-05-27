@@ -34,10 +34,13 @@ export async function login(): Promise<void> {
     await launch();
     const { page, browser } = launchResponse;
     if (!page || !browser) throw new Error('We was unable to launch the browser');
+    console.log('Visiting store');
     await page.goto('https://admin.rechargeapps.com/admin/login');
     await page.type('[name="email"]', config.email);
     await page.type('[name="password"]', config.password);
-    await page.click('[type="submit"]');
+    console.log('Typed email and password');
+    await page.click('[type="submit"]:not([disabled="disabled"])');
+    await page.screenshot({ path: 'login.png' });
     await page.waitForSelector('[class="select-store"]');
   } catch (error) {
     console.error('ERROR - login():', error);

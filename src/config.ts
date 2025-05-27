@@ -4,6 +4,7 @@ dotenv.config();
 
 const config = {
   store: process.env.RECHARGE_STORE ?? '',
+  mode: process.env.RECHARGE_MODE ?? '',
   theme_id: process.env.RECHARGE_THEME_ID ?? '',
   customer_id: process.env.RECHARGE_CUSTOMER_ID ?? '',
   email: process.env.RECHARGE_EMAIL ?? '',

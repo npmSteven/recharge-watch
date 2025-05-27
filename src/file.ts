@@ -1,4 +1,4 @@
-import client from "./client.js";
+import { client } from "./client.js";
 import { parseHTML } from "linkedom";
 import fs from "fs/promises";
 import config from "./config.js";
