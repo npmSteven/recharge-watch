@@ -40,7 +40,6 @@ export async function login(): Promise<void> {
     await page.type('[name="password"]', config.password);
     console.log('Typed email and password');
     await page.click('[type="submit"]:not([disabled="disabled"])');
-    await page.screenshot({ path: 'login.png' });
     await page.waitForSelector('[class="select-store"]');
   } catch (error) {
     console.error('ERROR - login():', error);

@@ -1,6 +1,6 @@
 {
   "name": "recharge-watch",
-  "version": "0.0.5",
+  "version": "0.0.7",
   "description": "",
   "type": "module",
   "main": "build/src/main.js",
