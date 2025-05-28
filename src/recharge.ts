@@ -82,6 +82,9 @@ export async function getDevelopmentUrl(): Promise<string> {
   try {
     if (cache?.dev_url) return cache.dev_url;
     const cookieStr = await getCookieStr();
+    console.log('dev_url', `${config.store}/admin_merchant/api/customers/${config.customer_id}/customer_portal_access?page_destination=subscriptions`);
+    console.log('store', config.store);
+    console.log('customer id', config.customer_id);
     const response = await axios.get(`${config.store}/admin_merchant/api/customers/${config.customer_id}/customer_portal_access?page_destination=subscriptions`, {
       headers: {
         Cookie: cookieStr,
